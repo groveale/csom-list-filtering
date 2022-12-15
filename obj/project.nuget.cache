@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "VxQAbhDLY537qzwStowgj9srRM+JxMXukeihgW7k93THFyesyFdLsA3DJ2Y1I/KoRObQ51pMv9uWJeheWjH0Iw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\alexgrover\\source\\repos\\csom-list-filtering\\csom-list-filtering.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\alexgrover\\.nuget\\packages\\microsoft.identity.client\\4.48.1\\microsoft.identity.client.4.48.1.nupkg.sha512",
+    "C:\\Users\\alexgrover\\.nuget\\packages\\microsoft.identitymodel.abstractions\\6.22.0\\microsoft.identitymodel.abstractions.6.22.0.nupkg.sha512",
+    "C:\\Users\\alexgrover\\.nuget\\packages\\microsoft.sharepointonline.csom\\16.1.23109.12000\\microsoft.sharepointonline.csom.16.1.23109.12000.nupkg.sha512"
+  ],
+  "logs": []
+}
