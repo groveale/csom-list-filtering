@@ -43,15 +43,36 @@ namespace Groverale
             //SkipAndTakePaging(siteLists, clientContext, 1000, 1000);
 
             // TitleFiltering
-            LinqWhereFiltering(siteLists, clientContext, "List-1");
+            //LinqWhereFiltering(siteLists, clientContext, "List-1");
 
+            PagingHack(web, clientContext);
+            
+        }
+
+        public static void PagingHack(Web web, ClientContext clientContext)
+        {
+            var paging = new ListCollectionPosition();
+            paging.PagingInfo = "skip";
+
+            GetListsParameters GetListQuery = new GetListsParameters();
+            GetListQuery.RowLimit = 10;
+            GetListQuery.ListCollectionPosition = paging;
+
+            CamlQuery camlQuery = new CamlQuery();
+            camlQuery.ViewXml = "<View Scope=\"RecursiveAll\"></View>";
+
+            
+            var query = web.GetLists(GetListQuery);
+            var lists = clientContext.LoadQuery(query);
+            clientContext.ExecuteQuery();
 
             
 
-
+            foreach (var list in lists)
+            {
+                Console.WriteLine($"Title: {list.Title} ID: {list.Id}");
+            }
         }
-
-
 
 
         public static void SkipAndTakePaging(ListCollection siteLists, ClientContext clientContext, int skip, int take)
