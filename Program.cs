@@ -1,7 +1,8 @@
 ﻿using Microsoft.Identity.Client;
 using Microsoft.SharePoint.Client;
 using System;
-using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -39,13 +40,27 @@ namespace Groverale
             // Load lists
             ListCollection siteLists = web.Lists;
 
+            var lists = clientContext.LoadQuery(siteLists);
+            clientContext.ExecuteQuery();
+
+
+            foreach (var list in lists)
+            {
+                Console.WriteLine($"Title: {list.Title} ID: {list.Id}");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine($"Found {lists.Count()} lists");
+            Console.WriteLine();
+
+
             // Only take is supported - does not help 
             //SkipAndTakePaging(siteLists, clientContext, 1000, 1000);
 
             // TitleFiltering
             //LinqWhereFiltering(siteLists, clientContext, "List-1");
 
-            PagingHack(web, clientContext);
+            //PagingHack(web, clientContext);
             
         }
 
@@ -65,8 +80,6 @@ namespace Groverale
             var query = web.GetLists(GetListQuery);
             var lists = clientContext.LoadQuery(query);
             clientContext.ExecuteQuery();
-
-            
 
             foreach (var list in lists)
             {
