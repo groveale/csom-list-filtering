@@ -38,20 +38,20 @@ namespace Groverale
             Console.WriteLine(web.Title);
 
             // Load lists
-            ListCollection siteLists = web.Lists;
+            // ListCollection siteLists = web.Lists;
 
-            var lists = clientContext.LoadQuery(siteLists);
-            clientContext.ExecuteQuery();
+            // var lists = clientContext.LoadQuery(siteLists);
+            // clientContext.ExecuteQuery();
 
 
-            foreach (var list in lists)
-            {
-                Console.WriteLine($"Title: {list.Title} ID: {list.Id}");
-            }
+            // foreach (var list in lists)
+            // {
+            //     Console.WriteLine($"Title: {list.Title} ID: {list.Id}");
+            // }
 
-            Console.WriteLine();
-            Console.WriteLine($"Found {lists.Count()} lists");
-            Console.WriteLine();
+            // Console.WriteLine();
+            // Console.WriteLine($"Found {lists.Count()} lists");
+            // Console.WriteLine();
 
 
             // Only take is supported - does not help 
@@ -61,30 +61,92 @@ namespace Groverale
             //LinqWhereFiltering(siteLists, clientContext, "List-1");
 
             //PagingHack(web, clientContext);
+
+            var allLists = ActualPaging(web, clientContext, 100);
+            Console.WriteLine($"Found {allLists.Count()} lists");
+
             
+        }
+
+        public static IEnumerable<List> ActualPaging(Web web, ClientContext clientContext, int PageSize)
+        {
+            List<List> allLists = new List<List>();
+
+            GetListsParameters getListQuery = new GetListsParameters();
+            getListQuery.RowLimit = PageSize;
+
+            ListCollection listsCollection = web.GetLists(getListQuery);
+            clientContext.Load(listsCollection);
+            clientContext.ExecuteQuery();
+
+            // First page
+            foreach (var list in listsCollection)
+            {
+                Console.WriteLine($"Title: {list.Title} ID: {list.Id}");  
+                allLists.Add(list);
+            }
+
+            Console.WriteLine(listsCollection.ListCollectionPosition.PagingInfo);
+
+            ListCollectionPosition position = listsCollection.ListCollectionPosition;
+
+            do
+            {
+                getListQuery.ListCollectionPosition = position;
+                listsCollection = web.GetLists(getListQuery);
+                clientContext.Load(listsCollection);
+                clientContext.ExecuteQuery();
+                position = listsCollection.ListCollectionPosition;
+
+                // Subsequent pages
+                foreach (var list in listsCollection)
+                {
+                    Console.WriteLine($"Title: {list.Title} ID: {list.Id}");
+                    allLists.Add(list);  
+                }
+
+            } while (position != null);
+
+            return allLists;
         }
 
         public static void PagingHack(Web web, ClientContext clientContext)
         {
-            var paging = new ListCollectionPosition();
-            paging.PagingInfo = "skip";
-
-            GetListsParameters GetListQuery = new GetListsParameters();
-            GetListQuery.RowLimit = 10;
-            GetListQuery.ListCollectionPosition = paging;
-
-            CamlQuery camlQuery = new CamlQuery();
-            camlQuery.ViewXml = "<View Scope=\"RecursiveAll\"></View>";
 
             
-            var query = web.GetLists(GetListQuery);
-            var lists = clientContext.LoadQuery(query);
+            GetListsParameters GetListQuery = new GetListsParameters();
+            GetListQuery.RowLimit = 10;
+
+            
+            ListCollection listQuery = web.GetLists(GetListQuery);
+            clientContext.Load(listQuery);
             clientContext.ExecuteQuery();
 
-            foreach (var list in lists)
+            foreach (var list in listQuery)
             {
                 Console.WriteLine($"Title: {list.Title} ID: {list.Id}");
+                
             }
+
+            // clientContext.Load(listQuery, l => l.ListCollectionPosition);
+            // clientContext.ExecuteQuery();
+
+            Console.WriteLine(listQuery.ListCollectionPosition.PagingInfo);
+
+            GetListsParameters GetNext10Query = new GetListsParameters();
+            GetNext10Query.RowLimit = 10;
+            GetNext10Query.ListCollectionPosition = listQuery.ListCollectionPosition;
+
+            ListCollection nextTenListQuery = web.GetLists(GetNext10Query);
+            clientContext.Load(nextTenListQuery);
+            clientContext.ExecuteQuery();
+
+            foreach (var list in nextTenListQuery)
+            {
+                Console.WriteLine($"Title: {list.Title} ID: {list.Id}");
+                
+            }
+
         }
 
 
